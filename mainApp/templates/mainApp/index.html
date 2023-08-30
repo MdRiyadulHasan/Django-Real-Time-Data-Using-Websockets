@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+
+  <div class = "container mt-5 pt-5"> 
+    <p>Percent completed : <span id="completed"></span></p>
+    <div class="progress">
+      <div id ="progress-bar" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+
+  </div>
+
+    
+
+    <table class="table table-striped mt-5 pt-5">
+        <thead>
+          <tr>
+            <th scope="col">SL</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Address</th>
+            <th scope="col">Age</th>
+          </tr>
+        </thead>
+        <tbody id = "table-data">
+          
+        </tbody>
+    </table>
+</div>
+
+<script> 
+  var url = 'ws://127.0.0.1:8000/ws/ac/'
+  var socket = new WebSocket(url)
+  socket.onopen = function(e){
+    console.log("socket connected")
+  }
+  socket.onmessage = function(e){
+    data1 = JSON.parse(e.data)
+    console.log(data1)
+    if (data1.payload){
+      addData(data1.payload)
+      increaseProgress(data1.payload.total, data1.payload.current_total)
+    }
+    
+  }
+  socket.onclose = function(e){
+    console.log("Socket disconnected")
+  }
+
+  function addData(data) {
+    var html = `<tr>
+      <th scope="row">${data.id}</th>
+      <td>${data.name}</td>
+      <td>${data.email}</td>
+      <td>${data.address}</td>
+      <td>${data.age}</td>
+    </tr>`;
+    document.getElementById('table-data').innerHTML += html;
+}
+
+function increaseProgress(total, currentTotal) {
+    var element = document.querySelector('#progress-bar');
+    var percent = (currentTotal / total) * 100; // Calculate the percentage correctly
+    
+    document.getElementById('completed').innerHTML = percent + '%';
+    element.style.width = percent + '%';
+}
+
+
+</script>
+
+<!-- Include Bootstrap JS (optional, for additional features) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
